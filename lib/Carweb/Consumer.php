@@ -27,10 +27,11 @@ class Consumer
      * @var array
      */
     protected $api_endpoints = array(
-        'http://www1.carwebuk.com',
-        'http://www3.carwebuk.com',
-        'http://www2.carwebuk.com',
-        'http://www.cwsecondary.net'
+        'https://www1.carwebuk.com',
+        'https://www2.carwebuk.com',
+        'https://www3.carwebuk.com',
+        'https://www4.carwebuk.com',
+        'https://www5.carwebuk.com'
     );
 
     /**
