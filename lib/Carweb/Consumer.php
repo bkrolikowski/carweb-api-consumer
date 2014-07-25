@@ -15,24 +15,9 @@ use Carweb\Validator\VRM;
 class Consumer
 {
     /**
-     * Carweb API version, this library is build against
-     */
-    const API_VERSION = '0.31.1';
-
-    /**
      * API path on the endpoint
      */
     const API_PATH = 'CarweBVrrB2Bproxy/carwebVrrWebService.asmx';
-
-    /**
-     * Denotes if a url is active
-     */
-    const ACTIVE_ENDPOINT = 1;
-
-    /**
-     * Denotes if a url is not active
-     */
-    const DISABLED_ENDPOINT = 1;
 
     /**
      * @var array
