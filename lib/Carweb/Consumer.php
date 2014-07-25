@@ -20,6 +20,16 @@ class Consumer
     const API_PATH = 'CarweBVrrB2Bproxy/carwebVrrWebService.asmx';
 
     /**
+     * Get vehicle by vrm endpoint name
+     */
+    const API_METHOD_GET_VEHICLE_BY_VRM = 'strB2BGetVehicleByVRM';
+
+    /**
+     * Get vehicle by vin endpoint name
+     */
+    const API_METHOD_GET_VEHICLE_BY_VIN = 'strB2BGetVehicleByVIN';
+
+    /**
      * @var array
      */
     protected $api_endpoints = array(
@@ -118,11 +128,9 @@ class Consumer
         if( ! $validator->isValid($vrm) && $this->validate)
             throw new ValidationException('Invalid UK VRM');
 
-        $api_method = 'strB2BGetVehicleByVRM';
+        $cache_key = sprintf('%s.%s', self::API_METHOD_GET_VEHICLE_BY_VRM, $vrm);
 
-        $cache_key = sprintf('%s.%s', $api_method, $vrm);
-
-        $converter = $this->getConverter($api_method);
+        $converter = $this->getConverter(self::API_METHOD_GET_VEHICLE_BY_VRM);
 
         if($this->isCached($cache_key))
         {
@@ -140,7 +148,7 @@ class Consumer
             'strClientDescription' => $strClientDescription
         );
 
-        $content = $this->call($api_method, RequestInterface::METHOD_GET, $input);
+        $content = $this->call(self::API_METHOD_GET_VEHICLE_BY_VRM, RequestInterface::METHOD_GET, $input);
 
         $this->setCached($cache_key, $content);
 
@@ -158,11 +166,10 @@ class Consumer
     public function findByVIN($vin, $strClientRef = 'default client', $strClientDescription = 'Carweb PHP Library')
     {
         $vin = strtoupper(preg_replace('/\s+/', '', $vin));
-        $api_method = 'strB2BGetVehicleByVIN';
 
-        $cache_key = sprintf('%s.%s', $api_method, $vin);
+        $cache_key = sprintf('%s.%s', self::API_METHOD_GET_VEHICLE_BY_VIN, $vin);
 
-        $converter = $this->getConverter($api_method);
+        $converter = $this->getConverter(self::API_METHOD_GET_VEHICLE_BY_VIN);
 
         if($this->isCached($cache_key))
         {
@@ -180,7 +187,7 @@ class Consumer
             'strClientDescription' => $strClientDescription
         );
 
-        $content = $this->call($api_method, RequestInterface::METHOD_GET, $input);
+        $content = $this->call(self::API_METHOD_GET_VEHICLE_BY_VIN, RequestInterface::METHOD_GET, $input);
 
         $this->setCached($cache_key, $content);
 
