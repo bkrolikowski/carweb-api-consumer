@@ -16,7 +16,7 @@ interface CacheInterface
      * gets cached value for current item
      *
      * @param $key
-     * @return mixed
+     * @return string|null
      */
     public function get($key);
 
@@ -25,7 +25,7 @@ interface CacheInterface
      *
      * @param $key
      * @param $value
-     * @return mixed
+     * @return void
      */
     public function save($key, $value);
 
@@ -33,7 +33,7 @@ interface CacheInterface
      * Clears the current value
      *
      * @param $key
-     * @return mixed
+     * @return void
      */
     public function clear($key);
 }

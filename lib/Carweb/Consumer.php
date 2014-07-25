@@ -81,6 +81,13 @@ class Consumer
     private $failover = true;
 
     /**
+     * Denotes if the response has been taken from cache
+     *
+     * @var bool
+     */
+    private $cachedResponse = false;
+
+    /**
      * Constructor
      *
      * @param $client
@@ -194,6 +201,15 @@ class Consumer
         return $converter->convert($content);
     }
 
+    /**
+     * @param string $api_method
+     * @param string $http_method
+     * @param array $query_string
+     * @param array $headers
+     * @param string $content
+     * @return string
+     * @throws Exception\ApiException
+     */
     public function call($api_method, $http_method = RequestInterface::METHOD_GET, array $query_string = array(), $headers = array(), $content = '')
     {
         $endpoints = $this->getApiEndpointsInRandomOrder();
@@ -226,15 +242,16 @@ class Consumer
     /**
      * Gets converted obj for given API method
      *
-     * @param $api_method
-     * @return \Carweb\ConverterInterface
+     * @param string $api_method
+     * @return \Carweb\Converter\ConverterInterface
      */
     public function getConverter($api_method)
     {
-        if(isset($this->converters[$api_method]))
+        if (isset($this->converters[$api_method])) {
             return $this->converters[$api_method];
-        else
+        } else {
             return new DefaultConverter();
+        }
     }
 
     /**
@@ -250,6 +267,14 @@ class Consumer
             throw new \InvalidArgumentException('$converter must be instance of ConverterInterface');
 
         $this->converters[$api_method] = $converter;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isCachedResponse()
+    {
+        return $this->cachedResponse;
     }
 
     /**
@@ -289,26 +314,33 @@ class Consumer
     /**
      * Cache proxy
      *
-     * @param $key
+     * @param string $key
      * @return bool
      */
     protected function isCached($key)
     {
-        if($this->cache)
+        if($this->cache) {
             return $this->cache->has($key);
-        else
+        }
+        else {
             return false;
+        }
     }
 
     /**
      * Cache proxy
      *
-     * @param $key
-     * @return mixed
+     * @param string $key
+     * @return null|string
      */
     protected function getCached($key)
     {
-        return $this->cache ? $this->cache->get($key) : null;
+        if ($this->cache) {
+            $this->cachedResponse = true;
+            return $this->cache->get($key);
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -316,14 +348,14 @@ class Consumer
      *
      * @param $key
      * @param $value
-     * @return mixed
+     * @return void
      */
     protected function setCached($key, $value)
     {
-        if($this->cache)
-            return $this->cache->save($key, $value);
-        else
-            return false;
+        $this->cachedResponse = false;
+        if ($this->cache) {
+            $this->cache->save($key, $value);
+        }
     }
 
     /**

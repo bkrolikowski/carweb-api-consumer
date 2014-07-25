@@ -62,6 +62,7 @@ class ConsumerTest extends \PHPUnit_Framework_TestCase
         $consumer = new Consumer($client, 'username', 'password', 'key', '0.31.1', null, true, false);
 
         $consumer->findByVRM('AA01 AAA', 'test', 'test');
+        $this->assertFalse($consumer->isCachedResponse());
     }
 
     public function testFindByVRMFailoverEnabled()
@@ -77,6 +78,8 @@ class ConsumerTest extends \PHPUnit_Framework_TestCase
         $consumer = new Consumer($client, 'username', 'password', 'key', '0.31.1', null, true, true);
 
         $consumer->findByVRM('AA01 AAA', 'test', 'test');
+
+        $this->assertFalse($consumer->isCachedResponse());
     }
 
     /**
@@ -117,6 +120,7 @@ class ConsumerTest extends \PHPUnit_Framework_TestCase
         $consumer = new Consumer($client, 'username', 'password', 'key', '0.31.1', $cache, true, false);
 
         $consumer->findByVRM('AA01 AAA', 'test', 'test');
+        $this->assertFalse($consumer->isCachedResponse());
     }
 
     public function testFindByVRMWithCacheFalseAndFailoverEnabled()
@@ -144,6 +148,7 @@ class ConsumerTest extends \PHPUnit_Framework_TestCase
         $consumer = new Consumer($client, 'username', 'password', 'key', '0.31.1', $cache, true, true);
 
         $consumer->findByVRM('AA01 AAA', 'test', 'test');
+        $this->assertFalse($consumer->isCachedResponse());
     }
 
     public function testFindByVRMWithCacheTrueAndFailoverDisabled()
@@ -166,6 +171,7 @@ class ConsumerTest extends \PHPUnit_Framework_TestCase
         $consumer = new Consumer($client, 'username', 'password', 'key', '0.31.1', $cache, true, false);
 
         $consumer->findByVRM('AA01 AAA', 'test', 'test');
+        $this->assertTrue($consumer->isCachedResponse());
     }
 
     public function testFindByVRMWithCacheTrueAndFailoverEnabled()
@@ -188,6 +194,7 @@ class ConsumerTest extends \PHPUnit_Framework_TestCase
         $consumer = new Consumer($client, 'username', 'password', 'key', '0.31.1', $cache, true, true);
 
         $consumer->findByVRM('AA01 AAA', 'test', 'test');
+        $this->assertTrue($consumer->isCachedResponse());
     }
 
     public function testFindByVINFailoverDisabled()
@@ -203,6 +210,7 @@ class ConsumerTest extends \PHPUnit_Framework_TestCase
         $consumer = new Consumer($client, 'username', 'password', 'key', '0.31.1', null, true, false);
 
         $consumer->findByVIN('VIN1234567890', 'test', 'test');
+        $this->assertFalse($consumer->isCachedResponse());
     }
 
     public function testFindByVINFailoverEnabled()
@@ -218,6 +226,7 @@ class ConsumerTest extends \PHPUnit_Framework_TestCase
         $consumer = new Consumer($client, 'username', 'password', 'key', '0.31.1', null, true, true);
 
         $consumer->findByVIN('VIN1234567890', 'test', 'test');
+        $this->assertFalse($consumer->isCachedResponse());
     }
 
     public function testFindByVINWithCacheFalseAndFailoverDisabled()
@@ -245,6 +254,7 @@ class ConsumerTest extends \PHPUnit_Framework_TestCase
         $consumer = new Consumer($client, 'username', 'password', 'key', '0.31.1', $cache, true, false);
 
         $consumer->findByVIN('VIN1234567890', 'test', 'test');
+        $this->assertFalse($consumer->isCachedResponse());
     }
 
     public function testFindByVINWithCacheFalseAndFailoverEnabled()
@@ -272,6 +282,7 @@ class ConsumerTest extends \PHPUnit_Framework_TestCase
         $consumer = new Consumer($client, 'username', 'password', 'key', '0.31.1', $cache, true, true);
 
         $consumer->findByVIN('VIN1234567890', 'test', 'test');
+        $this->assertFalse($consumer->isCachedResponse());
     }
 
     public function testFindByVINWithCacheTrueAndFailoverDisabled()
@@ -294,6 +305,7 @@ class ConsumerTest extends \PHPUnit_Framework_TestCase
         $consumer = new Consumer($client, 'username', 'password', 'key', '0.31.1', $cache, true, false);
 
         $consumer->findByVIN('VIN1234567890', 'test', 'test');
+        $this->assertTrue($consumer->isCachedResponse());
     }
 
     public function testFindByVINWithCacheTrueAndFailoverEnabled()
@@ -316,6 +328,7 @@ class ConsumerTest extends \PHPUnit_Framework_TestCase
         $consumer = new Consumer($client, 'username', 'password', 'key', '0.31.1', $cache, true, true);
 
         $consumer->findByVIN('VIN1234567890', 'test', 'test');
+        $this->assertTrue($consumer->isCachedResponse());
     }
 
     /**

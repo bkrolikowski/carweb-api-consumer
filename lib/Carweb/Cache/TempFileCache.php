@@ -44,7 +44,7 @@ class TempFileCache implements CacheInterface
      *
      * @param $key
      * @param $value
-     * @return mixed
+     * @return void
      */
     public function save($key, $value)
     {
@@ -77,7 +77,7 @@ class TempFileCache implements CacheInterface
      * Clears the current value
      *
      * @param $key
-     * @return mixed
+     * @return void
      */
     public function clear($key)
     {
