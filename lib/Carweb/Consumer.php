@@ -4,6 +4,7 @@ namespace Carweb;
 
 use Buzz\Message\RequestInterface;
 use Buzz\Message\Response;
+use Buzz\Exception\ClientException;
 use Carweb\Cache\CacheInterface;
 use Carweb\Converter\ConverterInterface;
 use Carweb\Converter\DefaultConverter;
@@ -22,6 +23,16 @@ class Consumer
      * API path on the endpoint
      */
     const API_PATH = 'CarweBVrrB2Bproxy/carwebVrrWebService.asmx';
+
+    /**
+     * Denotes if a url is active
+     */
+    const ACTIVE_ENDPOINT = 1;
+
+    /**
+     * Denotes if a url is not active
+     */
+    const DISABLED_ENDPOINT = 1;
 
     /**
      * @var array
@@ -70,16 +81,32 @@ class Consumer
     protected $converters = array();
 
     /**
+     * @var bool
+     */
+    private $failover = true;
+
+    /**
      * Constructor
      *
      * @param $client
-     * @param $strUserName
-     * @param $strPassword
-     * @param $strKey1
+     * @param string $strUserName
+     * @param string $strPassword
+     * @param string $strKey1
+     * @param string $web_version
      * @param null|\Carweb\Cache\CacheInterface $cache
+     * @param bool $validate
+     * @param bool $failover
      */
-    public function __construct($client, $strUserName, $strPassword, $strKey1,  $web_version, CacheInterface $cache = null, $validate = true )
-    {
+    public function __construct(
+        $client,
+        $strUserName,
+        $strPassword,
+        $strKey1,
+        $web_version,
+        CacheInterface $cache = null,
+        $validate = true,
+        $failover = true
+    ) {
         $this->client = $client;
         $this->strUserName = $strUserName;
         $this->strPassword = $strPassword;
@@ -87,6 +114,7 @@ class Consumer
         $this->cache = $cache;
         $this->validate = $validate;
         $this->web_version = $web_version;
+        $this->failover = $failover;
     }
 
     /**
@@ -176,19 +204,31 @@ class Consumer
 
     public function call($api_method, $http_method = RequestInterface::METHOD_GET, array $query_string = array(), $headers = array(), $content = '')
     {
-        $url = sprintf('%s/%s/%s?%s', $this->api_endpoints[array_rand($this->api_endpoints)], self::API_PATH, $api_method, http_build_query($query_string));
+        $endpoints = $this->getApiEndpointsInRandomOrder();
+        foreach($endpoints as $endpoint) {
+            $url = $this->getUrlFromEndpoint($endpoint, $api_method, $query_string);
+            /** @var Response $response */
+            try {
+                $response = $this->client->call($url, $http_method, $headers, $content);
+                if ($response->isSuccessful()) {
+                    $this->hasErrors($response->getContent());
+                    return $response->getContent();
+                }
 
-        $response = $this->client->call($url, $http_method, $headers, $content);
+                // should we try once again?
+                if (!$this->failover) {
+                    $this->handleException($response);
+                }
+            } catch(ClientException $e) {
+                // should we try once again?
+                if (!$this->failover) {
+                    throw $e;
+                }
+            }
+        }
 
-        if($response->isSuccessful())
-        {
-            $this->hasErrors($response->getContent());
-            return $response->getContent();
-        }
-        else
-        {
-            return $this->handleException($response);
-        }
+        //we give up
+        throw new ApiException('Could not connect to CarWeb');
     }
 
     /**
@@ -222,7 +262,7 @@ class Consumer
 
     /**
      * @param Response $response
-     * @throws \Exception
+     * @throws ApiException
      */
     protected function handleException(Response $response)
     {
@@ -292,5 +332,28 @@ class Consumer
             return $this->cache->save($key, $value);
         else
             return false;
+    }
+
+    /**
+     * @return array
+     */
+    protected function getApiEndpointsInRandomOrder()
+    {
+        $endpoints = $this->api_endpoints;
+        shuffle($endpoints);
+        return $endpoints;
+    }
+
+    /**
+     * Build url to call CarWeb
+     *
+     * @param string $endpoint
+     * @param string $apiMethod
+     * @param string $queryString
+     * @return string
+     */
+    protected function getUrlFromEndpoint($endpoint, $apiMethod, $queryString)
+    {
+        return sprintf('%s/%s/%s?%s', $endpoint, self::API_PATH, $apiMethod, http_build_query($queryString));
     }
 }
