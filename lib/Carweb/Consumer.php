@@ -30,6 +30,11 @@ class Consumer
     const API_METHOD_GET_VEHICLE_BY_VIN = 'strB2BGetVehicleByVIN';
 
     /**
+     * Error code used in case of missing vehicle data
+     */
+    const ERROR_CODE_NO_VEHICLES_RETURNED = 1000;
+
+    /**
      * @var array
      */
     protected $api_endpoints = array(
@@ -283,6 +288,11 @@ class Consumer
         throw new ApiException($response->getContent(), $response->getStatusCode());
     }
 
+    /**
+     * @param string $xml_string
+     * @return bool
+     * @throws Exception\ApiException
+     */
     protected function hasErrors($xml_string)
     {
         $doc = new \DOMDocument();
@@ -301,6 +311,10 @@ class Consumer
                 foreach($entry->childNodes as $node)
                     if($node->nodeName != '#text')
                         $error[$node->nodeName] = $node->nodeValue;
+
+            if ((int)$error['ErrorCode'] === self::ERROR_CODE_NO_VEHICLES_RETURNED) {
+                return false;
+            }
 
             throw new ApiException($error['ErrorDescription'],$error['ErrorCode']);
         }

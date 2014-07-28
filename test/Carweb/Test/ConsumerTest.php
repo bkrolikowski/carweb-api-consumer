@@ -389,6 +389,32 @@ class ConsumerTest extends \PHPUnit_Framework_TestCase
         $consumer->findByVIN('VIN1234567890', 'test', 'test');
     }
 
+    public function testCallWithNoVehicleDataError()
+    {
+        $client = $this->getClient();
+        $response = $this->getResponse(200,
+            '<?xml version="1.0" encoding="utf-8"?>
+<VRRError>
+    <DataArea>
+        <Error>
+            <Details>
+                <ErrorDescription>No Vehicles Returned</ErrorDescription>
+                <ErrorCode>1000</ErrorCode>
+            </Details>
+        </Error>
+    </DataArea>
+</VRRError>');
+
+        $client
+            ->expects($this->once())
+            ->method('call')
+            ->will($this->returnValue($response));
+
+        $consumer = new Consumer($client, 'username', 'password', 'key', '0.31.1', null, true, true);
+
+        $consumer->findByVIN('VIN1234567890', 'test', 'test');
+    }
+
     /**
      * @expectedException \Carweb\Exception\ApiException
      */
