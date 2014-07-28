@@ -413,10 +413,10 @@ class ConsumerTest extends \PHPUnit_Framework_TestCase
     public function testCallWithServerErrorFailoverEnabled()
     {
         $client = $this->getClient();
-        $response = $this->getResponse(500,'Server Error', 5);
+        $response = $this->getResponse(500,'Server Error', 3);
 
         $client
-            ->expects($this->exactly(5))
+            ->expects($this->exactly(3))
             ->method('call')
             ->will($this->returnValue($response));
 

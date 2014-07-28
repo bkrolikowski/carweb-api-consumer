@@ -33,11 +33,9 @@ class Consumer
      * @var array
      */
     protected $api_endpoints = array(
-        'https://www1.carwebuk.com',
         'https://www2.carwebuk.com',
         'https://www3.carwebuk.com',
-        'https://www4.carwebuk.com',
-        'https://www5.carwebuk.com'
+        'https://www1.carwebuk.com',
     );
 
     /**
@@ -212,8 +210,7 @@ class Consumer
      */
     public function call($api_method, $http_method = RequestInterface::METHOD_GET, array $query_string = array(), $headers = array(), $content = '')
     {
-        $endpoints = $this->getApiEndpointsInRandomOrder();
-        foreach($endpoints as $endpoint) {
+        foreach($this->api_endpoints as $endpoint) {
             $url = $this->getUrlFromEndpoint($endpoint, $api_method, $query_string);
             /** @var Response $response */
             try {
@@ -356,16 +353,6 @@ class Consumer
         if ($this->cache) {
             $this->cache->save($key, $value);
         }
-    }
-
-    /**
-     * @return array
-     */
-    protected function getApiEndpointsInRandomOrder()
-    {
-        $endpoints = $this->api_endpoints;
-        shuffle($endpoints);
-        return $endpoints;
     }
 
     /**
