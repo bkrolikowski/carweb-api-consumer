@@ -34,6 +34,8 @@ class Consumer
      */
     const ERROR_CODE_NO_VEHICLES_RETURNED = 1000;
 
+    const ERROR_CODE_VRM_VALIDATION_ERROR = 1002;
+
     /**
      * @var array
      */
@@ -312,7 +314,7 @@ class Consumer
                     if($node->nodeName != '#text')
                         $error[$node->nodeName] = $node->nodeValue;
 
-            if ((int)$error['ErrorCode'] === self::ERROR_CODE_NO_VEHICLES_RETURNED) {
+            if (in_array((int)$error['ErrorCode'], array(self::ERROR_CODE_NO_VEHICLES_RETURNED, self::ERROR_CODE_VRM_VALIDATION_ERROR))) {
                 return false;
             }
 
